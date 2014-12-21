@@ -10,3 +10,7 @@ Thumbs.db
 
 *.o
 
+#ignore backups of Eagle files
+*.s#[0-0]
+*.l#[0-0]
+*.b#[0-0]

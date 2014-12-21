@@ -1,0 +1,35 @@
+(.../pcb-gcode-3.6.0.4/pcb-gcode.ulp)
+(Copyright 2005 - 2012 by John Johnson)
+(See readme.txt for licensing terms.)
+(This file generated from the board:)
+(.../projects/freezeTime/freezeTime.brd)
+(Current profile is .../pcb-gcode-3.6.0.4/profiles/emc.pp  )
+(This file generated 9.10.2014 22:07:08)
+(Settings from pcb-machine.h)
+(  Tool Size)
+(0.3000 )
+(Z Axis Settings)
+(  High     Up        Down     Drill)
+(12.0000 	3.0000 	-0.0700 	-1.8000 )
+(spindle on time = 3.0000)
+(milling depth = 0.8000)
+(text depth = -0.1100)
+(tool change at 0.0000 0.0000 24.0000 )
+(feed rate xy = F250.00 )
+(feed rate z  = F80.00 )
+(Settings from pcb-defaults.h)
+(isolate min = 0.0700)
+(isolate max = 0.3000)
+(isolate step = 0.1500)
+(Generated top outlines, top drill, bottom outlines, bottom drill, )
+(Unit of measure: mm)
+(Metric Mode)
+G21
+(Absolute Coordinates)
+G90
+G00 X0.0000 Y0.0000 
+M03
+G04 P3.000000
+G00 Z12.0000 
+M05
+M02
