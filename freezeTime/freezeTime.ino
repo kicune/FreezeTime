@@ -53,6 +53,7 @@ FreezeTimer timers[] = {            //an array of timers
 
 byte encoderClicked = 0;
 byte risingFalling = 0;  
+boolean isDisplayOn = false;
 
 FreezeTimer *activeTimer = NULL;     //a pointer to the timer that currently receives an input
 byte activeTimerIdx;
@@ -72,7 +73,6 @@ unsigned long lastActivityTimestamp = 0;
 boolean isSleeping = false;
 
 void draw(void) {
-    //DEBUG
     u8g.setColorIndex(1);
     u8g.drawFrame(0,0,84, 48);
 //    u8g.setFont(u8g_font_unifont);  
@@ -84,7 +84,7 @@ void draw(void) {
 //put the FreezeTimer to sleep
 void sleep() {
      //turn the lcd light off
-    digitalWrite(LCD_LED_PIN, 0);
+    displayOff();
     //put the display to sleep
     u8g.sleepOff();
     //put ATMEL to sleep
@@ -95,13 +95,25 @@ void wakeUp() {
     //ATMEL will wake up itself with an interrupt
     //wake the display
     u8g.sleepOn();
-    //turn lcd light on
+    displayOn();
+    
+}
+
+void displayOn() {
     digitalWrite(LCD_LED_PIN, 1);
+    isDisplayOn = true;
+}
+
+void displayOff() {
+    digitalWrite(LCD_LED_PIN, 0);
+    isDisplayOn = false;
 }
 
 void timerSwitch() {
     lastActivityTimestamp = millis();
-
+    //if the lcd backlight is off, turn it on
+    if(!isDisplayOn) displayOn();
+    
     //deactivate current timer
     activeTimer->setActive(false);
     
@@ -118,26 +130,19 @@ void timerSwitch() {
 void encoderClick() {
     //confirm click by beeping
     tone(BEEP_PIN, NOTE_C4, 70);
+    //if the lcd backlight is off, turn it on
+    if(!isDisplayOn) displayOn();
     
     lastActivityTimestamp = millis();
     
     activeTimer->click();    
-    /*static boolean isSleeping = false;    
-    if(isSleeping) {
-        wakeUp();
-    } else {
-        sleep();        
-    }    
-    isSleeping = !isSleeping;*/
 }
 
 void encoderPress() {
     //confirm click by long beep
     tone(BEEP_PIN, NOTE_C4, 210);
     lastActivityTimestamp = millis();
-    
     activeTimer->longClick();
-    Serial.println("Encoder long press!");   
 }
 
 void soundAlarm() {
@@ -151,6 +156,26 @@ void soundAlarm() {
     }
 }
 
+void initialiseInterrupt() {
+    // PCICR |= (1 << PCIE2);
+    // PCMSK2 |= (1 << PCINT21);
+    // PCMSK2 |= (1 << PCINT23);  
+    
+  cli();		// switch interrupts off while messing with their settings  
+  
+  //arduino: 5 atmel: 11 - PCINT21
+  //arduino: 7 atmel: 13 - PCINT23
+  PCICR =0x04;          // Enable PCINT2interrupt
+//  PCMSK1 = 0b00101000;  //Pins 11 and 13 (5 and 7 on arduino)
+  PCMSK2 = 0b10100000;  //interrupt pins 21 and 23 (5 and 7 on arduino)
+  sei();		// turn interrupts back on
+}
+
+//ISR(PCINT2_vect) {    // Interrupt service routine. Every single PCINT8..14 (=ADC0..5) change
+            // will generate an interrupt: but this will always be the same interrupt routine
+//    tone(BEEP_PIN, NOTE_E4, 100);
+//}
+
 void setup(void) {
     //Serial.begin(9600);
     tone(BEEP_PIN, NOTE_C4, 100);
@@ -161,7 +186,7 @@ void setup(void) {
 
     //set LCD_LED_PIN to output
     pinMode(LCD_LED_PIN, OUTPUT);
-    digitalWrite(LCD_LED_PIN, 1);
+    displayOn();
     
     activeTimerIdx = 0;
     activeTimer = &timers[activeTimerIdx];
@@ -174,9 +199,9 @@ void setup(void) {
     //attach handler to encoder button
     btnEncoder.attachClick(encoderClick);
     //btnEncoder.attachDoubleClick(encoderDoubleClick);
-    btnEncoder.attachPress(encoderPress);
-    
-    //FIXME: enablovat interni pullup rezistory na nepouzivanych pinech
+    btnEncoder.attachPress(encoderPress);    
+    //FIXME: enable internal pullup resistor on unused pins to save the battery
+    //initialiseInterrupt();
 }
 
 void loop(void) {
@@ -194,6 +219,8 @@ void loop(void) {
     int clickDiff = (encValue - encPrevValue) / 2; //encoder changes 2 values per click
     if(clickDiff != 0) { 
         lastActivityTimestamp = millis();
+        //if the lcd backlight is off, turn it on
+        if(!isDisplayOn) displayOn();
         if(clickDiff > 0) {
             //Serial.println("Turned Left");  
             while(clickDiff > 0) {
@@ -226,11 +253,16 @@ void loop(void) {
             
         timers[f].updateTimer();
     }
-    //auto-off: if all timers are stopped,check if the last activity happened before TIMER_OFF_DELAY msec.
-    if(isAllStopped) {
-        if(millis() - lastActivityTimestamp > TIMER_OFF_DELAY) {
+    
+    //if the last activity happened before TIMER_OFF_DELAY msec...
+    if(millis() - lastActivityTimestamp > TIMER_OFF_DELAY) {
+        if(isAllStopped) {
+            //if all timers are stopped, put timer to sleep 
             sleep();
             isSleeping = true;
+        } else {
+          //if there are some timers running, just turn off the backlight
+          displayOff();
         }
     }
     

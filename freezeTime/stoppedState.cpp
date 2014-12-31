@@ -18,6 +18,7 @@ void StoppedState::turnRight() {
 void StoppedState::click() {
     //if a custom time interval is selected, then go to the period setting
     if(freezeTimer->getSelectedPreset()->time == 0) {
+        freezeTimer->setInitialTime(0);
         freezeTimer->setTimerState(&(freezeTimer->minuteSettingState));
     } else {
     //if a normal preset is selected, set its time into the actual timer's time:
