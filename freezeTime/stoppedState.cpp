@@ -28,6 +28,8 @@ void StoppedState::click() {
         freezeTimer->setTimerState( &(freezeTimer->runningState) );
         freezeTimer->startTimer();
     }
+    //initialize the timer state after we changed it>
+    freezeTimer->getTimerState()->init();
 };
 
 void StoppedState::longClick() {

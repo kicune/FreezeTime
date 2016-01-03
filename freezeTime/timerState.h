@@ -13,6 +13,8 @@ class TimerState {
     virtual void click();
     virtual void longClick();
     virtual void draw();
+    virtual void process(); //processes specific state-based actions
+    virtual void init(); //things to do when entering the state
 };
 
 

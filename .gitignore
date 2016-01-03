@@ -9,6 +9,7 @@ ehthumbs.db
 Thumbs.db
 
 *.o
+*.swp
 
 #ignore backups of Eagle files
 *.s#[0-9]

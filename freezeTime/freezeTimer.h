@@ -22,6 +22,8 @@ typedef struct Preset {
 #define TEXT_X_OFFSET   2
 #define TEXT_Y_OFFSET   6
 
+#define MANUAL_SETTING_TIMEOUT  15000 //number of miliseconds of inactivity in minute/secondSettingState after which the timer starts automaticaly 
+
 char* formatTime(char *buffer, long milliTime);
 
 class TimerState;

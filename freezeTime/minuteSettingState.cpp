@@ -17,6 +17,9 @@ void MinuteSettingState::turnLeft() {
     if(iTime >= 0) {
         freezeTimer->setInitialTime(iTime);
     }
+
+    //reset inactive timer
+    inactiveTimer = millis();
 };
 
 
@@ -31,11 +34,16 @@ void MinuteSettingState::turnRight() {
     if(iTime < 59940000L) {
         freezeTimer->setInitialTime(iTime);
     }
+
+    //reset inactive timer
+    inactiveTimer = millis();
     
 };
 
 void MinuteSettingState::click() {
    freezeTimer->setTimerState(&(freezeTimer->secondSettingState));
+   //initialize the timer state after we changed it>
+   freezeTimer->getTimerState()->init();   
 };
 
 void MinuteSettingState::longClick() {
@@ -86,4 +94,15 @@ void MinuteSettingState::draw() {
     disp->setColorIndex(color);    
     disp->drawStr(pX - w, pY, buffer2);
 }
+
+void MinuteSettingState::process() {
+    if(millis() - inactiveTimer > MANUAL_SETTING_TIMEOUT) {
+      //start the timer automaticaly
+      freezeTimer->startTimer();
+    }
+};
+
+void MinuteSettingState::init() {
+    inactiveTimer = millis();
+};
 

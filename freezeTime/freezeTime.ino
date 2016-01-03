@@ -265,15 +265,25 @@ void loop(void) {
           displayOff();
         }
     }
+
     
     
     //is alarm active for any of the timers? if yes, sound the alarm
     for(int f = 0; f < NUM_OF_TIMERS; f++) {
         if(timers[f].getTimerState() == &timers[f].alarmState) {
+            //if the focus is on an inactive alarm, switch to the active one
+            if(!timers[f].getActive()) {
+              timerSwitch();
+            }
             soundAlarm();
             //and skip the rest - multiple beeps causes problems
             break;
         }
+    }
+
+    //process state-specific actions:
+    for(int f = 0; f < NUM_OF_TIMERS; f++) {
+      timers[f].getTimerState()->process();
     }
 
     // picture loop

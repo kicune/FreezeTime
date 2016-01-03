@@ -14,6 +14,11 @@ class SecondSettingState : public TimerState {
     virtual void click();
     virtual void longClick();
     virtual void draw();
+    virtual void process();
+    virtual void init();
+
+   private:
+    long inactiveTimer;
   
 };
 

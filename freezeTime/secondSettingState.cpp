@@ -16,6 +16,9 @@ void SecondSettingState::turnLeft() {
     if(iTime > 0) {
         freezeTimer->setInitialTime(iTime);
     }
+
+    //reset inactive timer
+    inactiveTimer = millis();
 };
 
 
@@ -30,6 +33,9 @@ void SecondSettingState::turnRight() {
     if(iTime < 59940000L) {
         freezeTimer->setInitialTime(iTime);
     }
+
+    //reset inactive timer
+    inactiveTimer = millis();
 };
 
 void SecondSettingState::click() {
@@ -74,5 +80,18 @@ void SecondSettingState::draw() {
     //...and then print only seconds in a reverted color 
     disp->setColorIndex(color);
     disp->drawStr(pX - wSeconds + 1, pY, buffer2);
-}
+};
+
+void SecondSettingState::process() {
+    if(millis() - inactiveTimer > MANUAL_SETTING_TIMEOUT) {
+      //start the timer automaticaly
+      freezeTimer->startTimer();
+    }
+};
+
+void SecondSettingState::init() {
+      //resets the timer
+      inactiveTimer = millis();
+};
+
 

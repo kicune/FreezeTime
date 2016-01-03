@@ -22,4 +22,12 @@ void TimerState::draw()
     freezeTimer->getDisplay()->drawStr180(freezeTimer->getX(), freezeTimer->getY(), freezeTimer->getName());
 }
 
+void TimerState::process() 
+{
+}
+
+void TimerState::init() 
+{
+}
+
 
