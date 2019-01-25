@@ -31,7 +31,7 @@
 //5110 sw SPI: U8GLIB_PCD8544(cs, a0 [, reset])
 //led sck mosi d/c(a0) rst sce(c/s) gnd vcc
 //U8GLIB_PCD8544 u8g(12, 11, 8, 10, 9);
-U8GLIB_PCD8544 u8g(0, 1, 8, 10, 9);
+U8GLIB_PCD8544 u8g(0, 1, 8, 10, 9); 
 
 #define NUM_OF_TIMERS    2
 FreezeTimer timers[] = {            //an array of timers
@@ -183,6 +183,7 @@ void setup(void) {
     tone(BEEP_PIN, NOTE_C4, 100);    
  
     u8g.setColorIndex(1);
+    u8g.setRot180();
 
     //set LCD_LED_PIN to output
     pinMode(LCD_LED_PIN, OUTPUT);
